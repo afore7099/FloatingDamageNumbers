@@ -29,11 +29,34 @@ function FDN.Combat.OnCombatEvent(
 
     if not isDamage and not isHeal then return end
 
-    FDN.FloatingText.Show(
+    local isOutgoing = sourceType == COMBAT_UNIT_TYPE_PLAYER
+    local isIncoming = targetType == COMBAT_UNIT_TYPE_PLAYER
+
+    local category
+    if isHeal then
+        category = "HEAL"
+    elseif isOutgoing then
+        category = "OUTGOING"
+    elseif isIncoming then
+        category = "INCOMING"
+    else
+        return
+    end
+
+    FDN.Aggregation.Add(
         hitValue,
         result,
-        sourceType,
-        targetType,
-        targetUnitId
+        category,
+        targetUnitId,
+        function(total, finalResult, finalCategory, unitId)
+            FDN.FloatingText.Show(
+                total,
+                finalResult,
+                sourceType,
+                targetType,
+                unitId,
+                finalCategory
+            )
+        end
     )
 end
