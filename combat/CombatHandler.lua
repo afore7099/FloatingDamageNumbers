@@ -14,7 +14,7 @@ function FDN.Combat.OnCombatEvent(
     targetType,
     hitValue,
     _,
-    _,
+    damageType,
     _,
     _,
     targetUnitId
@@ -43,33 +43,34 @@ function FDN.Combat.OnCombatEvent(
         return
     end
 
-    if FDN.Settings and FDN.Settings.sv and FDN.Settings.sv.aggregationEnabled then
-    FDN.Aggregation.Add(
-        hitValue,
-        result,
-        category,
-        targetUnitId,
-        function(total, finalResult, finalCategory, unitId)
-            FDN.FloatingText.Show(
-                total,
-                finalResult,
-                sourceType,
-                targetType,
-                unitId,
-                finalCategory
-            )
-        end
-    )
-else
-    -- No aggregation: show immediately
-    FDN.FloatingText.Show(
-        hitValue,
-        result,
-        sourceType,
-        targetType,
-        targetUnitId,
-        category
-    )
-end
-
+    if FDN.Settings.sv.aggregationEnabled then
+        FDN.Aggregation.Add(
+            hitValue,
+            result,
+            category,
+            targetUnitId,
+            damageType,
+            function(total, finalResult, finalCategory, unitId, finalDamageType)
+                FDN.FloatingText.Show(
+                    total,
+                    finalResult,
+                    sourceType,
+                    targetType,
+                    unitId,
+                    finalCategory,
+                    finalDamageType
+                )
+            end
+        )
+    else
+        FDN.FloatingText.Show(
+            hitValue,
+            result,
+            sourceType,
+            targetType,
+            targetUnitId,
+            category,
+            damageType
+        )
+    end
 end

@@ -14,3 +14,16 @@ FDN.Constants.MOVE = {
     UP   = -80,
     DOWN = 80,
 }
+
+-- Supported ESO damage types
+FDN.Constants.DAMAGE_TYPES = {
+    [DAMAGE_TYPE_PHYSICAL] = "Physical",
+    [DAMAGE_TYPE_FIRE]     = "Fire",
+    [DAMAGE_TYPE_SHOCK]    = "Shock",
+    [DAMAGE_TYPE_OBLIVION] = "Oblivion",
+    [DAMAGE_TYPE_COLD]     = "Frost",
+    [DAMAGE_TYPE_POISON]   = "Poison",
+    [DAMAGE_TYPE_DISEASE]  = "Disease",
+    [DAMAGE_TYPE_MAGIC]    = "Magic",
+    [DAMAGE_TYPE_BLEED]    = "Bleed",
+}

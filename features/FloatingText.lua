@@ -1,9 +1,15 @@
 FDN = FDN or {}
 FDN.FloatingText = {}
 
-FDN.FloatingText.positions = {}
-
-function FDN.FloatingText.Show(amount, result, sourceType, targetType, targetUnitId, category)
+function FDN.FloatingText.Show(
+    amount,
+    result,
+    sourceType,
+    targetType,
+    targetUnitId,
+    category,
+    damageType
+)
     local label, key = FDN.Pool.Acquire()
 
     local isOutgoing = category == "OUTGOING"
@@ -25,6 +31,8 @@ function FDN.FloatingText.Show(amount, result, sourceType, targetType, targetUni
         label:SetColor(unpack(FDN.Constants.COLORS.HEAL))
     elseif isIncoming then
         label:SetColor(unpack(FDN.Constants.COLORS.INCOMING))
+    elseif FDN.Settings.sv.damageTypeColors[damageType] then
+        label:SetColor(unpack(FDN.Settings.sv.damageTypeColors[damageType]))
     elseif result == ACTION_RESULT_CRITICAL_DAMAGE then
         label:SetColor(unpack(FDN.Constants.COLORS.CRIT))
         label:SetScale(1.2)
@@ -32,7 +40,9 @@ function FDN.FloatingText.Show(amount, result, sourceType, targetType, targetUni
         label:SetColor(unpack(FDN.Constants.COLORS.OUTGOING))
     end
 
-    local moveY = isIncoming and FDN.Constants.MOVE.DOWN or FDN.Constants.MOVE.UP
+    local moveY = isIncoming and
+        FDN.Constants.MOVE.DOWN or
+        FDN.Constants.MOVE.UP
 
     local timeline = ANIMATION_MANAGER:CreateTimeline()
     local move = timeline:InsertAnimation(ANIMATION_TRANSLATE, label, 0)

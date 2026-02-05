@@ -1,32 +1,23 @@
 FDN = FDN or {}
 FDN.Aggregation = {}
 
--- Active buckets
 FDN.Aggregation.buckets = {}
 
--- How long to aggregate before flushing (ms)
-local function GetAggregationWindowMs()
-    if FDN.Settings and FDN.Settings.sv then
-        return FDN.Settings.sv.aggregationWindowMs
-    end
-    return 400
-end 
-
--- ============================================================================
--- Internal: build aggregation key
--- ============================================================================
-local function BuildKey(targetUnitId, category)
-    return string.format("%s:%s", tostring(targetUnitId), category)
+local function GetWindow()
+    return (FDN.Settings and FDN.Settings.sv and
+            FDN.Settings.sv.aggregationWindowMs) or 400
 end
 
--- ============================================================================
--- Add a value to aggregation
--- ============================================================================
+local function BuildKey(targetUnitId, category)
+    return tostring(targetUnitId) .. ":" .. category
+end
+
 function FDN.Aggregation.Add(
     amount,
     result,
     category,
     targetUnitId,
+    damageType,
     flushCallback
 )
     local now = GetFrameTimeMilliseconds()
@@ -37,14 +28,15 @@ function FDN.Aggregation.Add(
     if not bucket then
         bucket = {
             total = 0,
-            lastUpdate = now,
             result = result,
-            targetUnitId = targetUnitId,
             category = category,
+            targetUnitId = targetUnitId,
+            damageType = damageType,
+            time = now,
         }
+
         FDN.Aggregation.buckets[key] = bucket
 
-        -- Schedule flush
         zo_callLater(function()
             local b = FDN.Aggregation.buckets[key]
             if not b then return end
@@ -54,11 +46,11 @@ function FDN.Aggregation.Add(
                 b.total,
                 b.result,
                 b.category,
-                b.targetUnitId
+                b.targetUnitId,
+                b.damageType
             )
-        end, GetAggregationWindowMs())
+        end, GetWindow())
     end
 
     bucket.total = bucket.total + amount
-    bucket.lastUpdate = now
 end

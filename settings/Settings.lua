@@ -3,16 +3,25 @@ FDN.Settings = {}
 
 local ADDON_NAME = "FloatingDamageNumbers"
 
--- Defaults
 FDN.Settings.defaults = {
     aggregationEnabled = true,
     aggregationWindowMs = 400,
+
+    damageTypeColors = {
+        [DAMAGE_TYPE_PHYSICAL] = {1, 1, 1, 1},
+        [DAMAGE_TYPE_FIRE]     = {1, 0.3, 0.1, 1},
+        [DAMAGE_TYPE_SHOCK]    = {0.6, 0.6, 1, 1},
+        [DAMAGE_TYPE_OBLIVION] = {0.7, 0.2, 0.9, 1},
+        [DAMAGE_TYPE_COLD]     = {0.4, 0.8, 1, 1},
+        [DAMAGE_TYPE_POISON]   = {0.3, 0.8, 0.3, 1},
+        [DAMAGE_TYPE_DISEASE]  = {0.6, 0.5, 0.2, 1},
+        [DAMAGE_TYPE_MAGIC]    = {0.9, 0.9, 0.6, 1},
+        [DAMAGE_TYPE_BLEED]    = {0.8, 0.1, 0.1, 1},
+    },
 }
 
--- Saved variables reference
 FDN.Settings.sv = nil
 
--- Initialize Settings + Panel
 function FDN.Settings.Initialize()
     FDN.Settings.sv = ZO_SavedVars:NewAccountWide(
         "FDN_SavedVariables",
@@ -22,17 +31,14 @@ function FDN.Settings.Initialize()
     )
 
     local LAM = LibAddonMenu2
-    if not LAM then
-        d("[FDN] LibAddonMenu-2.0 not found")
-        return
-    end
+    if not LAM then return end
 
     local panelData = {
         type = "panel",
         name = "Floating Damage Numbers",
         displayName = "Floating Damage Numbers",
         author = "@bluraptor7099",
-        version = FDN.Version and FDN.Version.GetFormatted() or "unknown",
+        version = FDN.Version.GetFormatted(),
         registerForRefresh = true,
         registerForDefaults = true,
     }
@@ -47,7 +53,6 @@ function FDN.Settings.Initialize()
         {
             type = "checkbox",
             name = "Enable Aggregation",
-            tooltip = "Merge rapid hits and damage-over-time ticks into a single number.",
             getFunc = function()
                 return FDN.Settings.sv.aggregationEnabled
             end,
@@ -59,7 +64,6 @@ function FDN.Settings.Initialize()
         {
             type = "slider",
             name = "Aggregation Window (ms)",
-            tooltip = "How long damage is accumulated before being shown.",
             min = 100,
             max = 1000,
             step = 50,
@@ -74,7 +78,26 @@ function FDN.Settings.Initialize()
                 return not FDN.Settings.sv.aggregationEnabled
             end,
         },
+        {
+            type = "header",
+            name = "Damage Type Colors",
+        },
     }
+
+    for damageType, name in pairs(FDN.Constants.DAMAGE_TYPES) do
+        table.insert(optionsTable, {
+            type = "colorpicker",
+            name = name .. " Damage",
+            getFunc = function()
+                local c = FDN.Settings.sv.damageTypeColors[damageType]
+                return c[1], c[2], c[3], c[4]
+            end,
+            setFunc = function(r, g, b, a)
+                FDN.Settings.sv.damageTypeColors[damageType] = { r, g, b, a }
+            end,
+            default = FDN.Settings.defaults.damageTypeColors[damageType],
+        })
+    end
 
     LAM:RegisterOptionControls("FDN_SettingsPanel", optionsTable)
 end
