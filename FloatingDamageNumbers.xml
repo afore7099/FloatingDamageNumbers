@@ -1,11 +1,29 @@
 <GuiXml>
   <Controls>
-    <Label name="DamageNumbersLabel"
-           font="ZoFontGameBold"
-           color="1 0 0 1"
-           hidden="true">
+    <TopLevelControl
+        name="FloatingDamageNumbersRoot"
+        hidden="false"
+        mouseEnabled="false"
+        drawLayer="OVERLAY"
+        drawTier="TOP"
+        drawLevel="100">
+
+      <Dimensions x="400" y="300" />
+      <Anchor
+          point="CENTER"
+          relativeTo="GuiRoot"
+          relativePoint="CENTER"
+          offsetX="0"
+          offsetY="0" />
+    </TopLevelControl>
+    <Label
+        name="FloatingDamageNumbersLabelTemplate"
+        virtual="true"
+        font="ZoFontGameBold"
+        hidden="true">
+
       <Dimensions x="200" y="50" />
-      <Anchor point="CENTER" />
     </Label>
+
   </Controls>
 </GuiXml>

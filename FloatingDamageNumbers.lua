@@ -1,37 +1,91 @@
 FloatingDamageNumbers = {}
 FloatingDamageNumbers.name = "FloatingDamageNumbers"
 
-local function OnCombatEvent(eventCode, result, isError, abilityName, abilityGraphic, abilityActionSlotType, sourceName, sourceType, targetName, targetType, 
-    hitValue, powerType, damageType, log, sourceUnitId, targetUnitId, abilityId, overflow)
-    -- Only proceed for damage events
-    if result ~= ACTION_RESULT_DAMAGE and result ~= ACTION_RESULT_CRITICAL_DAMAGE then
+-- ============================================================================
+-- Early proof that the Lua file itself is executing
+-- ============================================================================
+d("FloatingDamageNumbers addon initialized")
+
+FloatingDamageNumbers.pool = nil
+
+
+-- ============================================================================
+-- Combat Event Handler
+-- ============================================================================
+local function OnCombatEvent(
+    eventCode,
+    result,
+    isError,
+    abilityName,
+    abilityGraphic,
+    abilityActionSlotType,
+    sourceName,
+    sourceType,
+    targetName,
+    targetType,
+    hitValue,
+    powerType,
+    damageType,
+    log,
+    sourceUnitId,
+    targetUnitId,
+    abilityId
+)
+    if result ~= ACTION_RESULT_DAMAGE and
+       result ~= ACTION_RESULT_CRITICAL_DAMAGE then
         return
     end
-    -- Only show for player dealing damage
-    if sourceType ~= COMBAT_UNIT_TYPE_PLAYER then
-        return
-    end
-    FloatingDamageNumbers.ShowFloatingNumber(targetUnitId, hitValue, result)
+
+    FloatingDamageNumbers.ShowFloatingNumber(hitValue, result)
+    d("Combat event fired")
 end
 
-local function OnAddonLoaded(event, addOnName)
-    if addonName ~= FloatingDamageNumbers.name then return end
+-- ============================================================================
+-- Initialization Logic (SAFE & RELIABLE)
+-- ============================================================================
+local function Initialize()
+    FloatingDamageNumbers.pool = ZO_ControlPool:New(
+        "FloatingDamageNumbersLabelTemplate",
+        FloatingDamageNumbersRoot,
+        "FloatingLabel"
+    )
 
     EVENT_MANAGER:RegisterForEvent(
-        DamageNumbers.name,
+        FloatingDamageNumbers.name,
         EVENT_COMBAT_EVENT,
         OnCombatEvent
     )
 
-    -- Filter only outgoing damage
     EVENT_MANAGER:AddFilterForEvent(
-        DamageNumbers.name,
+        FloatingDamageNumbers.name,
         EVENT_COMBAT_EVENT,
         REGISTER_FILTER_SOURCE_COMBAT_UNIT_TYPE,
         COMBAT_UNIT_TYPE_PLAYER
     )
 
+    EVENT_MANAGER:AddFilterForEvent(
+        FloatingDamageNumbers.name,
+        EVENT_COMBAT_EVENT,
+        REGISTER_FILTER_IS_ERROR,
+        false
+    )
+
     d("FloatingDamageNumbers loaded")
+end
+
+
+-- ============================================================================
+-- Add-on Load Event
+-- ============================================================================
+local function OnAddonLoaded(event, addonName)
+    if addonName ~= FloatingDamageNumbers.name then return end
+
+    EVENT_MANAGER:UnregisterForEvent(
+        FloatingDamageNumbers.name,
+        EVENT_ADD_ON_LOADED
+    )
+
+    Initialize()
 end
 
 EVENT_MANAGER:RegisterForEvent(
@@ -40,40 +94,67 @@ EVENT_MANAGER:RegisterForEvent(
     OnAddonLoaded
 )
 
-function FloatingDamageNumbers.ShowDamage(amount, result)
-    local label = FloatingDamageNumbersLabel
+-- ============================================================================
+-- Safety Net: Handle cases where EVENT_ADD_ON_LOADED already fired
+-- ============================================================================
+-- if IsAddOnLoaded(FloatingDamageNumbers.name) then
+--     Initialize()
+-- end
+
+-- ============================================================================
+-- Floating Damage Number Display
+-- ============================================================================
+function FloatingDamageNumbers.ShowFloatingNumber(amount, result)
+    local pool = FloatingDamageNumbers.pool
+    if not pool then return end
+
+    local label, key = pool:AcquireObject()
+
+    label:ClearAnchors()
+    label:SetAnchor(CENTER, FloatingDamageNumbersRoot, CENTER,
+                    math.random(-40, 40), 0)
+
     label:SetText(tostring(amount))
 
     if result == ACTION_RESULT_CRITICAL_DAMAGE then
-        label:SetColor(1, 0.6, 0, 1) -- orange crit
+        label:SetColor(1, 0.6, 0, 1) -- crit
+        label:SetScale(1.2)
     else
-        label:SetColor(1, 0, 0, 1) -- red normal
+        label:SetColor(1, 0, 0, 1)
+        label:SetScale(1.0)
     end
 
     label:SetHidden(false)
 
     local timeline = ANIMATION_MANAGER:CreateTimeline()
-    local anim = timeline:InsertAnimation(
+
+    local move = timeline:InsertAnimation(
         ANIMATION_TRANSLATE,
         label,
         0
     )
+    move:SetTranslateOffsets(0, 0, 0, -100)
+    move:SetDuration(600)
 
-    anim:SetTranslateOffsets(0, 0, 0, -80)
-    anim:SetDuration(600)
+    local fade = timeline:InsertAnimation(
+        ANIMATION_ALPHA,
+        label,
+        300
+    )
+    fade:SetAlphaValues(1, 0)
+    fade:SetDuration(300)
 
     timeline:SetPlaybackType(ANIMATION_PLAYBACK_ONE_SHOT)
-    timeline:PlayFromStart()
 
-    zo_callLater(function()
+    timeline:SetHandler("OnStop", function()
         label:SetHidden(true)
-    end, 700)
+        label:SetAlpha(1)
+        label:SetScale(1)
+        pool:ReleaseObject(key)
+    end)
+
+    timeline:PlayFromStart()
 end
 
-EVENT_MANAGER:AddFilterForEvent(
-    FloatingDamageNumbers.name,
-    EVENT_COMBAT_EVENT,
-    REGISTER_FILTER_IS_ERROR,
-    false
-)
+
 
