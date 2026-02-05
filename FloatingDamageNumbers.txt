@@ -1,0 +1,7 @@
+## Title: Floating Damage Numbers
+## Author: Andrew Fore
+## Version: 1.0.0
+## APIVersion: 101049
+## Description: Visualize damage dealt and damage received through floating damage numbers.
+
+FloatingDamageNumbers.lua

@@ -1,0 +1,11 @@
+<GuiXml>
+  <Controls>
+    <Label name="DamageNumbersLabel"
+           font="ZoFontGameBold"
+           color="1 0 0 1"
+           hidden="true">
+      <Dimensions x="200" y="50" />
+      <Anchor point="CENTER" />
+    </Label>
+  </Controls>
+</GuiXml>
