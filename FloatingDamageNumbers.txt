@@ -14,10 +14,8 @@ core/Pool.lua
 settings/Settings.lua
 
 combat/ReticleTracker.lua
-
 features/Aggregation.lua
 features/FloatingText.lua
-
 combat/CombatHandler.lua
 
 FloatingDamageNumbers.lua
