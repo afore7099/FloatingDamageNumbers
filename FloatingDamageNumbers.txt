@@ -12,8 +12,10 @@ core/Version.lua
 core/Pool.lua
 
 combat/ReticleTracker.lua
-combat/CombatHandler.lua
 
+features/Aggregation.lua
 features/FloatingText.lua
+
+combat/CombatHandler.lua
 
 FloatingDamageNumbers.lua

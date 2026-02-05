@@ -3,12 +3,12 @@ FDN.FloatingText = {}
 
 FDN.FloatingText.positions = {}
 
-function FDN.FloatingText.Show(amount, result, sourceType, targetType, targetUnitId)
+function FDN.FloatingText.Show(amount, result, sourceType, targetType, targetUnitId, category)
     local label, key = FDN.Pool.Acquire()
 
-    local isOutgoing = sourceType == COMBAT_UNIT_TYPE_PLAYER
-    local isIncoming = targetType == COMBAT_UNIT_TYPE_PLAYER
-    local isHeal = result == ACTION_RESULT_HEAL or result == ACTION_RESULT_CRITICAL_HEAL
+    local isOutgoing = category == "OUTGOING"
+    local isIncoming = category == "INCOMING"
+    local isHeal     = category == "HEAL"
 
     local x = FDN.Reticle.lastX
     local y = FDN.Reticle.lastY
