@@ -1,7 +1,19 @@
 ## Title: FloatingDamageNumbers
 ## Author: @bluraptor7099
 ## Version: 1.0.0
+## AddOnVersion: 100
 ## APIVersion: 101049
-## Description: Visualize damage dealt and damage received through floating damage numbers.
-FloatingDamageNumbers.lua
+
 FloatingDamageNumbers.xml
+
+core/Constants.lua
+core/Util.lua
+core/Version.lua
+core/Pool.lua
+
+combat/ReticleTracker.lua
+combat/CombatHandler.lua
+
+features/FloatingText.lua
+
+FloatingDamageNumbers.lua
