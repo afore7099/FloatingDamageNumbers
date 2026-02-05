@@ -11,6 +11,8 @@ core/Util.lua
 core/Version.lua
 core/Pool.lua
 
+settings/Settings.lua
+
 combat/ReticleTracker.lua
 
 features/Aggregation.lua
