@@ -7,6 +7,7 @@ EVENT_MANAGER:RegisterForEvent(
         EVENT_MANAGER:UnregisterForEvent("FDN_Init", EVENT_PLAYER_ACTIVATED)
 
         FDN.Pool.Initialize()
+        FDN.Settings.Initialize()
 
         EVENT_MANAGER:RegisterForEvent(
             "FDN_Combat",

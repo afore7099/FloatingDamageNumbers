@@ -5,7 +5,12 @@ FDN.Aggregation = {}
 FDN.Aggregation.buckets = {}
 
 -- How long to aggregate before flushing (ms)
-local AGGREGATION_WINDOW_MS = 400
+local function GetAggregationWindowMs()
+    if FDN.Settings and FDN.Settings.sv then
+        return FDN.Settings.sv.aggregationWindowMs
+    end
+    return 400
+end 
 
 -- ============================================================================
 -- Internal: build aggregation key
@@ -51,7 +56,7 @@ function FDN.Aggregation.Add(
                 b.category,
                 b.targetUnitId
             )
-        end, AGGREGATION_WINDOW_MS)
+        end, GetAggregationWindowMs())
     end
 
     bucket.total = bucket.total + amount

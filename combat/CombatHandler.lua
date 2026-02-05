@@ -43,6 +43,7 @@ function FDN.Combat.OnCombatEvent(
         return
     end
 
+    if FDN.Settings and FDN.Settings.sv and FDN.Settings.sv.aggregationEnabled then
     FDN.Aggregation.Add(
         hitValue,
         result,
@@ -59,4 +60,16 @@ function FDN.Combat.OnCombatEvent(
             )
         end
     )
+else
+    -- No aggregation: show immediately
+    FDN.FloatingText.Show(
+        hitValue,
+        result,
+        sourceType,
+        targetType,
+        targetUnitId,
+        category
+    )
+end
+
 end
