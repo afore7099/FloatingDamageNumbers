@@ -20,7 +20,10 @@
         name="FloatingDamageNumbersLabelTemplate"
         virtual="true"
         font="ZoFontGameBold"
-        hidden="true">
+        hidden="true"
+        drawLayer="OVERLAY"
+        drawTier="TOP"
+        drawLevel="200">
 
       <Dimensions x="200" y="50" />
     </Label>
