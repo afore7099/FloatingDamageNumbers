@@ -11,50 +11,51 @@ function FDN.FloatingText.Show(
     damageType
 )
     local label, key = FDN.Pool.Acquire()
+    label:ClearAnchors()
 
-    local isOutgoing      = category == "OUTGOING" or category == "OUTGOING_HEAL"
-    local isIncoming      = category == "INCOMING" or category == "INCOMING_HEAL"
-    local isOutgoingHeal  = category == "OUTGOING_HEAL"
-    local isIncomingHeal  = category == "INCOMING_HEAL"
-    local isHeal          = isOutgoingHeal or isIncomingHeal
+    local isOutgoingDamage = category == "OUTGOING"
+    local isIncomingDamage = category == "INCOMING"
+    local isOutgoingHeal   = category == "OUTGOING_HEAL"
+    local isIncomingHeal   = category == "INCOMING_HEAL"
+    local isHeal           = isOutgoingHeal or isIncomingHeal
 
-    local x = FDN.Reticle.lastX
-    local y = FDN.Reticle.lastY
-
-    -- Positioning
-    if isOutgoing and FDN.Util.IsOnScreen(x, y) then
-        label:SetAnchor(TOPLEFT, GuiRoot, TOPLEFT, x, y)
+    -- Positioning (your current anchor-point layout)
+    if isOutgoingDamage then
+        if FDN.Util.IsOnScreen(FDN.Reticle.lastX, FDN.Reticle.lastY) then
+            label:SetAnchor(CENTER, GuiRoot, CENTER, FDN.Reticle.lastX, FDN.Reticle.lastY)
+        else
+            label:SetAnchor(CENTER, GuiRoot, CENTER)
+        end
+    elseif isIncomingHeal then
+        label:SetAnchor(RIGHT, GuiRoot, CENTER, -120, 0)
+    elseif isOutgoingHeal then
+        label:SetAnchor(CENTER, GuiRoot, CENTER, 0, 80)
     else
-        label:SetAnchor(CENTER, GuiRoot, CENTER)
+        label:SetAnchor(LEFT, GuiRoot, CENTER, 120, 0)
     end
 
-    -- Number formatting
+    -- Number formatting (+ for heals)
     local displayText
     if FDN.Settings.sv.numberFormattingEnabled then
-        displayText = FDN.Util.FormatNumber(
-            amount,
-            FDN.Settings.sv.numberFormattingPrecision
-        )
+        displayText = FDN.Util.FormatNumber(amount, FDN.Settings.sv.numberFormattingPrecision)
     else
         displayText = tostring(amount)
     end
+    if isHeal then
+        displayText = "+" .. displayText
+    end
 
-    local font = string.format(
-        "%s|%d|soft-shadow-thick",
-        FDN.Settings.sv.fontName,
-        FDN.Settings.sv.fontSize
-    )
-
-    label:SetFont(font)
+    label:SetFont(string.format("%s|%d|soft-shadow-thick", FDN.Settings.sv.fontName, FDN.Settings.sv.fontSize))
     label:SetText(displayText)
 
-    -- COLOR SELECTION
+    --COLORS
     if isIncomingHeal then
         label:SetColor(unpack(FDN.Settings.sv.incomingHealColor))
     elseif isOutgoingHeal then
         label:SetColor(unpack(FDN.Settings.sv.outgoingHealColor))
-    elseif isIncoming then
-        label:SetColor(unpack(FDN.Constants.COLORS.INCOMING))
+    elseif isIncomingDamage then
+        --user-configurable incoming damage color
+        label:SetColor(unpack(FDN.Settings.sv.incomingDamageColor))
     elseif FDN.Settings.sv.damageTypeColors[damageType] then
         label:SetColor(unpack(FDN.Settings.sv.damageTypeColors[damageType]))
     elseif result == ACTION_RESULT_CRITICAL_DAMAGE then
@@ -67,9 +68,7 @@ function FDN.FloatingText.Show(
     -- Animation
     local baseDuration = 600
     local speed = FDN.Settings.sv.animationSpeed or 1.0
-    local moveY = isIncoming and
-        FDN.Constants.MOVE.DOWN or
-        FDN.Constants.MOVE.UP
+    local moveY = isIncomingDamage and 60 or -60
 
     local timeline = ANIMATION_MANAGER:CreateTimeline()
     local move = timeline:InsertAnimation(ANIMATION_TRANSLATE, label, 0)
