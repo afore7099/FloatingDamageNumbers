@@ -20,9 +20,7 @@ function FDN.Aggregation.Add(
     damageType,
     flushCallback
 )
-    local now = GetFrameTimeMilliseconds()
     local key = BuildKey(targetUnitId, category)
-
     local bucket = FDN.Aggregation.buckets[key]
 
     if not bucket then
@@ -32,16 +30,14 @@ function FDN.Aggregation.Add(
             category = category,
             targetUnitId = targetUnitId,
             damageType = damageType,
-            time = now,
         }
-
         FDN.Aggregation.buckets[key] = bucket
 
         zo_callLater(function()
             local b = FDN.Aggregation.buckets[key]
             if not b then return end
-
             FDN.Aggregation.buckets[key] = nil
+
             flushCallback(
                 b.total,
                 b.result,

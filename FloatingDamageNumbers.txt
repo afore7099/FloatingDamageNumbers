@@ -4,6 +4,7 @@
 ## AddOnVersion: 100
 ## APIVersion: 101049
 ## DependsOn: LibAddonMenu-2.0
+## SavedVariables: FDN_SavedVariables
 
 FloatingDamageNumbers.xml
 
