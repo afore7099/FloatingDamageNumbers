@@ -1,11 +1,19 @@
 FDN = FDN or {}
 FDN.Settings = {}
 
-local ADDON_NAME = "FloatingDamageNumbers"
-
 FDN.Settings.defaults = {
-    aggregationEnabled = true,
+    aggregationEnabled  = true,
     aggregationWindowMs = 400,
+
+    fontName       = "ZoFontGameBold",
+    fontSize       = 24,
+    animationSpeed = 1.0,
+
+    numberFormattingEnabled  = true,
+    numberFormattingPrecision = 1,
+
+    incomingHealColor = {0.4, 1, 0.7, 1},
+    outgoingHealColor = {0.2, 0.9, 0.4, 1},
 
     damageTypeColors = {
         [DAMAGE_TYPE_PHYSICAL] = {1, 1, 1, 1},
@@ -46,19 +54,13 @@ function FDN.Settings.Initialize()
     LAM:RegisterAddonPanel("FDN_SettingsPanel", panelData)
 
     local optionsTable = {
-        {
-            type = "header",
-            name = "Aggregation",
-        },
+
+        { type = "header", name = "Aggregation" },
         {
             type = "checkbox",
             name = "Enable Aggregation",
-            getFunc = function()
-                return FDN.Settings.sv.aggregationEnabled
-            end,
-            setFunc = function(value)
-                FDN.Settings.sv.aggregationEnabled = value
-            end,
+            getFunc = function() return FDN.Settings.sv.aggregationEnabled end,
+            setFunc = function(v) FDN.Settings.sv.aggregationEnabled = v end,
             default = FDN.Settings.defaults.aggregationEnabled,
         },
         {
@@ -67,21 +69,118 @@ function FDN.Settings.Initialize()
             min = 100,
             max = 1000,
             step = 50,
-            getFunc = function()
-                return FDN.Settings.sv.aggregationWindowMs
-            end,
-            setFunc = function(value)
-                FDN.Settings.sv.aggregationWindowMs = value
-            end,
+            getFunc = function() return FDN.Settings.sv.aggregationWindowMs end,
+            setFunc = function(v) FDN.Settings.sv.aggregationWindowMs = v end,
             default = FDN.Settings.defaults.aggregationWindowMs,
             disabled = function()
                 return not FDN.Settings.sv.aggregationEnabled
             end,
         },
+
+        { type = "header", name = "Text Appearance" },
         {
-            type = "header",
-            name = "Damage Type Colors",
+            type = "dropdown",
+            name = "Font",
+            choices = (function()
+                local t = {}
+                for label in pairs(FDN.Constants.FONTS) do
+                    table.insert(t, label)
+                end
+                table.sort(t)
+                return t
+            end)(),
+            getFunc = function()
+                for label, font in pairs(FDN.Constants.FONTS) do
+                    if font == FDN.Settings.sv.fontName then
+                        return label
+                    end
+                end
+            end,
+            setFunc = function(label)
+                FDN.Settings.sv.fontName = FDN.Constants.FONTS[label]
+            end,
+            default = "Game Bold",
         },
+        {
+            type = "slider",
+            name = "Font Size",
+            min = 12,
+            max = 64,
+            step = 1,
+            getFunc = function() return FDN.Settings.sv.fontSize end,
+            setFunc = function(v) FDN.Settings.sv.fontSize = v end,
+            default = FDN.Settings.defaults.fontSize,
+        },
+        {
+            type = "slider",
+            name = "Animation Speed",
+            min = 0.5,
+            max = 2.5,
+            step = 0.1,
+            getFunc = function() return FDN.Settings.sv.animationSpeed end,
+            setFunc = function(v) FDN.Settings.sv.animationSpeed = v end,
+            default = FDN.Settings.defaults.animationSpeed,
+        },
+
+        { type = "header", name = "Number Formatting" },
+        {
+            type = "checkbox",
+            name = "Enable Abbreviated Numbers",
+            getFunc = function()
+                return FDN.Settings.sv.numberFormattingEnabled
+            end,
+            setFunc = function(v)
+                FDN.Settings.sv.numberFormattingEnabled = v
+            end,
+            default = FDN.Settings.defaults.numberFormattingEnabled,
+        },
+        {
+            type = "slider",
+            name = "Decimal Precision",
+            min = 0,
+            max = 2,
+            step = 1,
+            getFunc = function()
+                return FDN.Settings.sv.numberFormattingPrecision
+            end,
+            setFunc = function(v)
+                FDN.Settings.sv.numberFormattingPrecision = v
+            end,
+            default = FDN.Settings.defaults.numberFormattingPrecision,
+            disabled = function()
+                return not FDN.Settings.sv.numberFormattingEnabled
+            end,
+        },
+
+        { type = "header", name = "Healing Colors" },
+        {
+            type = "colorpicker",
+            name = "Incoming Healing",
+            tooltip = "Color used for healing you receive.",
+            getFunc = function()
+                local c = FDN.Settings.sv.incomingHealColor
+                return c[1], c[2], c[3], c[4]
+            end,
+            setFunc = function(r, g, b, a)
+                FDN.Settings.sv.incomingHealColor = { r, g, b, a }
+            end,
+            default = FDN.Settings.defaults.incomingHealColor,
+        },
+        {
+            type = "colorpicker",
+            name = "Outgoing Healing",
+            tooltip = "Color used for healing you cast.",
+            getFunc = function()
+                local c = FDN.Settings.sv.outgoingHealColor
+                return c[1], c[2], c[3], c[4]
+            end,
+            setFunc = function(r, g, b, a)
+                FDN.Settings.sv.outgoingHealColor = { r, g, b, a }
+            end,
+            default = FDN.Settings.defaults.outgoingHealColor,
+        },
+
+        { type = "header", name = "Damage Type Colors" },
     }
 
     for damageType, name in pairs(FDN.Constants.DAMAGE_TYPES) do

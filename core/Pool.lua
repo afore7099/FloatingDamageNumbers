@@ -25,6 +25,9 @@ function FDN.Pool.Acquire()
     label:SetDrawLevel(200)
     label:ClearAnchors()
 
+    -- Safe fallback font
+    label:SetFont("ZoFontGameBold|24|soft-shadow-thick")
+
     return label, key
 end
 

@@ -1,13 +1,13 @@
 FDN = FDN or {}
 FDN.Constants = {}
 
-FDN.Constants.POSITION_TTL_MS = 1500
-
 FDN.Constants.COLORS = {
     OUTGOING = {1, 0, 0, 1},
     CRIT     = {1, 0.6, 0, 1},
     INCOMING = {0.7, 0.2, 1, 1},
-    HEAL     = {0.2, 1, 0.2, 1},
+    HEAL     = {0.2, 1, 0.2, 1},          -- fallback heal
+    INCOMING_HEAL = {0.4, 1, 0.7, 1},
+    OUTGOING_HEAL = {0.2, 0.9, 0.4, 1},
 }
 
 FDN.Constants.MOVE = {
@@ -15,7 +15,6 @@ FDN.Constants.MOVE = {
     DOWN = 80,
 }
 
--- Supported ESO damage types
 FDN.Constants.DAMAGE_TYPES = {
     [DAMAGE_TYPE_PHYSICAL] = "Physical",
     [DAMAGE_TYPE_FIRE]     = "Fire",
@@ -26,4 +25,12 @@ FDN.Constants.DAMAGE_TYPES = {
     [DAMAGE_TYPE_DISEASE]  = "Disease",
     [DAMAGE_TYPE_MAGIC]    = "Magic",
     [DAMAGE_TYPE_BLEED]    = "Bleed",
+}
+
+FDN.Constants.FONTS = {
+    ["Game Default"] = "ZoFontGame",
+    ["Game Bold"]    = "ZoFontGameBold",
+    ["Antique"]      = "ZoFontAntique",
+    ["Chat"]         = "ZoFontChat",
+    ["Alert"]        = "ZoFontAlert",
 }
