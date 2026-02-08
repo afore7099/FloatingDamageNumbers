@@ -34,3 +34,11 @@ FDN.Constants.FONTS = {
     ["Chat"]         = "ZoFontChat",
     ["Alert"]        = "ZoFontAlert",
 }
+
+FDN.Constants.CATEGORY = {
+    INCOMING_DAMAGE = "INCOMING_DAMAGE",
+    OUTGOING_DAMAGE = "OUTGOING_DAMAGE",
+    INCOMING_HEAL   = "INCOMING_HEAL",
+    OUTGOING_HEAL   = "OUTGOING_HEAL",
+}
+

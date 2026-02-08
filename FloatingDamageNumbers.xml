@@ -1,31 +1,74 @@
 <GuiXml>
   <Controls>
+
+    <!-- ===============================
+         OUTGOING DAMAGE (CENTER)
+         =============================== -->
     <TopLevelControl
-        name="FloatingDamageNumbersRoot"
-        hidden="false"
+        name="FDN_Column_OutgoingDamage"
         mouseEnabled="false"
+        hidden="false"
         drawLayer="OVERLAY"
         drawTier="TOP"
         drawLevel="100">
 
-      <Dimensions x="400" y="300" />
+      <Anchor
+          point="CENTER"
+          relativeTo="GuiRoot"
+          relativePoint="CENTER" />
+    </TopLevelControl>
+
+    <!-- ===============================
+         INCOMING DAMAGE (BELOW CENTER)
+         =============================== -->
+    <TopLevelControl
+        name="FDN_Column_IncomingDamage"
+        mouseEnabled="false"
+        hidden="false"
+        drawLayer="OVERLAY"
+        drawTier="TOP"
+        drawLevel="100">
+
       <Anchor
           point="CENTER"
           relativeTo="GuiRoot"
           relativePoint="CENTER"
           offsetX="0"
+          offsetY="180" />
+    </TopLevelControl>
+
+    <!-- ===============================
+         HEALING (RIGHT)
+         =============================== -->
+    <TopLevelControl
+        name="FDN_Column_Healing"
+        mouseEnabled="false"
+        hidden="false"
+        drawLayer="OVERLAY"
+        drawTier="TOP"
+        drawLevel="100">
+
+      <Anchor
+          point="CENTER"
+          relativeTo="GuiRoot"
+          relativePoint="CENTER"
+          offsetX="320"
           offsetY="0" />
     </TopLevelControl>
+
+    <!-- ===============================
+         SHARED LABEL TEMPLATE
+         =============================== -->
     <Label
-        name="FloatingDamageNumbersLabelTemplate"
+        name="FDN_LabelTemplate"
         virtual="true"
-        font="ZoFontGameBold"
         hidden="true"
+        font="ZoFontGameBold"
         drawLayer="OVERLAY"
         drawTier="TOP"
         drawLevel="200">
 
-      <Dimensions x="200" y="50" />
+      <Dimensions x="300" y="50" />
     </Label>
 
   </Controls>

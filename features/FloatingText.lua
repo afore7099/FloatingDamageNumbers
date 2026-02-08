@@ -1,6 +1,40 @@
 FDN = FDN or {}
 FDN.FloatingText = {}
 
+local CATEGORY = FDN.Constants.CATEGORY
+
+-- ============================================================
+-- COLUMN POOLS
+-- ============================================================
+FDN.FloatingText.pools = {
+    [CATEGORY.OUTGOING_DAMAGE] = ZO_ControlPool:New(
+        "FDN_LabelTemplate",
+        FDN_Column_OutgoingDamage,
+        "OutgoingDamage"
+    ),
+
+    [CATEGORY.INCOMING_DAMAGE] = ZO_ControlPool:New(
+        "FDN_LabelTemplate",
+        FDN_Column_IncomingDamage,
+        "IncomingDamage"
+    ),
+
+    [CATEGORY.INCOMING_HEAL] = ZO_ControlPool:New(
+        "FDN_LabelTemplate",
+        FDN_Column_Healing,
+        "IncomingHeal"
+    ),
+
+    [CATEGORY.OUTGOING_HEAL] = ZO_ControlPool:New(
+        "FDN_LabelTemplate",
+        FDN_Column_Healing,
+        "OutgoingHeal"
+    ),
+}
+
+-- ============================================================
+-- SHOW FLOATING TEXT
+-- ============================================================
 function FDN.FloatingText.Show(
     amount,
     result,
@@ -10,51 +44,54 @@ function FDN.FloatingText.Show(
     category,
     damageType
 )
-    local label, key = FDN.Pool.Acquire()
+    local pool = FDN.FloatingText.pools[category]
+    if not pool then return end
+
+    local label, key = pool:AcquireObject()
     label:ClearAnchors()
+    label:SetAnchor(CENTER, nil, CENTER)
 
-    local isOutgoingDamage = category == "OUTGOING"
-    local isIncomingDamage = category == "INCOMING"
-    local isOutgoingHeal   = category == "OUTGOING_HEAL"
-    local isIncomingHeal   = category == "INCOMING_HEAL"
-    local isHeal           = isOutgoingHeal or isIncomingHeal
+    -- ============================================================
+    -- CATEGORY FLAGS
+    -- ============================================================
+    local isIncomingDamage = category == CATEGORY.INCOMING_DAMAGE
+    local isOutgoingDamage = category == CATEGORY.OUTGOING_DAMAGE
+    local isIncomingHeal   = category == CATEGORY.INCOMING_HEAL
+    local isOutgoingHeal   = category == CATEGORY.OUTGOING_HEAL
+    local isHeal           = isIncomingHeal or isOutgoingHeal
 
-    -- Positioning (your current anchor-point layout)
-    if isOutgoingDamage then
-        if FDN.Util.IsOnScreen(FDN.Reticle.lastX, FDN.Reticle.lastY) then
-            label:SetAnchor(CENTER, GuiRoot, CENTER, FDN.Reticle.lastX, FDN.Reticle.lastY)
-        else
-            label:SetAnchor(CENTER, GuiRoot, CENTER)
-        end
-    elseif isIncomingHeal then
-        label:SetAnchor(RIGHT, GuiRoot, CENTER, -120, 0)
-    elseif isOutgoingHeal then
-        label:SetAnchor(CENTER, GuiRoot, CENTER, 0, 80)
-    else
-        label:SetAnchor(LEFT, GuiRoot, CENTER, 120, 0)
-    end
-
-    -- Number formatting (+ for heals)
+    -- ============================================================
+    -- NUMBER FORMATTING
+    -- ============================================================
     local displayText
     if FDN.Settings.sv.numberFormattingEnabled then
-        displayText = FDN.Util.FormatNumber(amount, FDN.Settings.sv.numberFormattingPrecision)
+        displayText = FDN.Util.FormatNumber(
+            amount,
+            FDN.Settings.sv.numberFormattingPrecision
+        )
     else
         displayText = tostring(amount)
     end
+
     if isHeal then
         displayText = "+" .. displayText
     end
 
-    label:SetFont(string.format("%s|%d|soft-shadow-thick", FDN.Settings.sv.fontName, FDN.Settings.sv.fontSize))
+    label:SetFont(string.format(
+        "%s|%d|soft-shadow-thick",
+        FDN.Settings.sv.fontName,
+        FDN.Settings.sv.fontSize
+    ))
     label:SetText(displayText)
 
-    --COLORS
+    -- ============================================================
+    -- COLORS
+    -- ============================================================
     if isIncomingHeal then
         label:SetColor(unpack(FDN.Settings.sv.incomingHealColor))
     elseif isOutgoingHeal then
         label:SetColor(unpack(FDN.Settings.sv.outgoingHealColor))
     elseif isIncomingDamage then
-        --user-configurable incoming damage color
         label:SetColor(unpack(FDN.Settings.sv.incomingDamageColor))
     elseif FDN.Settings.sv.damageTypeColors[damageType] then
         label:SetColor(unpack(FDN.Settings.sv.damageTypeColors[damageType]))
@@ -65,10 +102,16 @@ function FDN.FloatingText.Show(
         label:SetColor(unpack(FDN.Constants.COLORS.OUTGOING))
     end
 
-    -- Animation
+    label:SetHidden(false)
+
+    -- ============================================================
+    -- ANIMATION
+    -- ============================================================
     local baseDuration = 600
     local speed = FDN.Settings.sv.animationSpeed or 1.0
-    local moveY = isIncomingDamage and 60 or -60
+
+    -- Incoming damage floats DOWN, everything else floats UP
+    local moveY = isIncomingDamage and 80 or -80
 
     local timeline = ANIMATION_MANAGER:CreateTimeline()
     local move = timeline:InsertAnimation(ANIMATION_TRANSLATE, label, 0)
@@ -78,7 +121,7 @@ function FDN.FloatingText.Show(
     timeline:SetHandler("OnStop", function()
         label:SetHidden(true)
         label:SetScale(1)
-        FDN.Pool.Release(key)
+        pool:ReleaseObject(key)
     end)
 
     timeline:PlayFromStart()
