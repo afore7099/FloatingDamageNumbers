@@ -1,7 +1,7 @@
 ## Title: FloatingDamageNumbers
 ## Author: @bluraptor7099
-## Version: 1.2.0
-## AddOnVersion: 120
+## Version: 1.3.0
+## AddOnVersion: 130
 ## APIVersion: 101049
 ## DependsOn: LibAddonMenu-2.0
 ## SavedVariables: FDN_SavedVariables
