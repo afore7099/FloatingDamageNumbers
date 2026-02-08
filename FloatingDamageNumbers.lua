@@ -10,16 +10,47 @@ EVENT_MANAGER:RegisterForEvent(
         FDN.Pool.Initialize()
         FDN.Settings.Initialize()
 
-        -- IMPORTANT: no source/target filters here
+        -- ============================================================
+        -- OUTGOING: player is the SOURCE
+        -- ============================================================
         EVENT_MANAGER:RegisterForEvent(
-            "FDN_Combat",
+            "FDN_Combat_Out",
             EVENT_COMBAT_EVENT,
-            FDN.Combat.OnCombatEvent
+            FDN.Combat.OnCombatEventOutgoing
         )
 
-        -- Keep only error filtering
         EVENT_MANAGER:AddFilterForEvent(
-            "FDN_Combat",
+            "FDN_Combat_Out",
+            EVENT_COMBAT_EVENT,
+            REGISTER_FILTER_SOURCE_COMBAT_UNIT_TYPE,
+            COMBAT_UNIT_TYPE_PLAYER
+        )
+
+        EVENT_MANAGER:AddFilterForEvent(
+            "FDN_Combat_Out",
+            EVENT_COMBAT_EVENT,
+            REGISTER_FILTER_IS_ERROR,
+            false
+        )
+
+        -- ============================================================
+        -- INCOMING: player is the TARGET
+        -- ============================================================
+        EVENT_MANAGER:RegisterForEvent(
+            "FDN_Combat_In",
+            EVENT_COMBAT_EVENT,
+            FDN.Combat.OnCombatEventIncoming
+        )
+
+        EVENT_MANAGER:AddFilterForEvent(
+            "FDN_Combat_In",
+            EVENT_COMBAT_EVENT,
+            REGISTER_FILTER_TARGET_COMBAT_UNIT_TYPE,
+            COMBAT_UNIT_TYPE_PLAYER
+        )
+
+        EVENT_MANAGER:AddFilterForEvent(
+            "FDN_Combat_In",
             EVENT_COMBAT_EVENT,
             REGISTER_FILTER_IS_ERROR,
             false
