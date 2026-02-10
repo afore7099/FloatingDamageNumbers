@@ -18,7 +18,9 @@ local function ProcessCombatEvent(
 )
     local isDamage =
         result == ACTION_RESULT_DAMAGE or
-        result == ACTION_RESULT_CRITICAL_DAMAGE
+        result == ACTION_RESULT_CRITICAL_DAMAGE or
+        result == ACTION_RESULT_DOT_TICK or
+        result == ACTION_RESULT_DOT_TICK_CRITICAL
 
     local isHeal =
         result == ACTION_RESULT_HEAL or
