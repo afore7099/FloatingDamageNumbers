@@ -15,14 +15,14 @@ FDN.Settings.defaults = {
     numberFormattingEnabled   = true,
     numberFormattingPrecision = 1,
 
-    -- Healing colors (already in your system)
+    -- Healing colors
     incomingHealColor = {0.4, 1, 0.7, 1},
     outgoingHealColor = {0.2, 0.9, 0.4, 1},
 
-    -- ✅ NEW: Incoming damage color (separate from damage-type coloring)
+    -- Incoming damage color
     incomingDamageColor = {0.7, 0.2, 1.0, 1},
 
-    -- Damage type colors (your existing system)
+    -- Damage type colors
     damageTypeColors = {
         [DAMAGE_TYPE_PHYSICAL] = {1, 1, 1, 1},
         [DAMAGE_TYPE_FIRE]     = {1, 0.3, 0.1, 1},
