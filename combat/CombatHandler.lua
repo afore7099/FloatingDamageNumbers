@@ -24,7 +24,9 @@ local function ProcessCombatEvent(
 
     local isHeal =
         result == ACTION_RESULT_HEAL or
-        result == ACTION_RESULT_CRITICAL_HEAL
+        result == ACTION_RESULT_CRITICAL_HEAL or
+        result == ACTION_RESULT_HOT_TICK or
+        result == ACTION_RESULT_HOT_TICK_CRITICAL
 
     if not isDamage and not isHeal then
         return
